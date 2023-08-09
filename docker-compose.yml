@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  web:
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    image: udemy-python-app
+    container_name: udemy-python-app
+    volumes:
+      - ./:/app
+    ports: 
+      - 5000:5000
