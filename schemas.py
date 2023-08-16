@@ -16,6 +16,10 @@ class ItemUpdateSchema(Schema):
     name = fields.Str(required=True)
     price = fields.Float(required=True)
 
+
+class StoreUpdateSchema(Schema):
+    name = fields.Str(required=True)
+
 class ItemSchema(PlainItemSchema):
     store_id = fields.Int(required=True, load_only=True)
     store = fields.Nested(PlainStoreSchema(), dump_only=True)

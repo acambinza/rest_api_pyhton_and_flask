@@ -4,7 +4,7 @@ from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
-from schemas import StoreSchema
+from schemas import StoreSchema, StoreUpdateSchema
 
 from db import db
 from models import StoreModel
@@ -21,21 +21,34 @@ class StoreList(MethodView):
         store = StoreModel.query.get_or_404(store_id)
         return store
 
-    def put(self, store_id):
-        raise NotImplementedError("Updating an store is not implemented.")
-    
+    @blp.arguments(StoreUpdateSchema)
+    @blp.response(201, StoreSchema)
+    def put(self, store_data, store_id):
+        store = StoreModel.query.get_or_404(store_id)
+        store.name = store_data["name"]
+
+        db.session.add(store)
+        db.session.commit()
+
+        return store
+
+
     def delete(self, store_id):
-        raise NotImplementedError("Deleting an store is not implemented.")
+        store = StoreModel.query.get_or_404(store_id)
+
+        db.session.delete(store)
+        db.session.commit()
+
+        return {"message": "Store deleted"}
+
+        
 
 
 @blp.route('/store')
 class Store(MethodView):
     @blp.response(200, StoreSchema(many=True))
     def get(self):
-        try:
-            return stores.values()
-        except KeyError:
-            abort(404, message=STORE_NOT_FOUND)
+        return StoreModel.query.all()
     
     @blp.arguments(StoreSchema)
     @blp.response(201, StoreSchema)
